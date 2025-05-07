@@ -67,13 +67,28 @@ const CompetenciesStep = ({ formData, setFormData, onBack, onSubmit }) => {
 
   {/* Keep these as regular inputs */}
   {[
-    ["Relevant Industry Experience", "industryExperience"],
-    ["Key Areas of Experience", "keyExperience"],
-  ].map(([label, name]) => (
-    <div key={name}>
-      <label className="block mb-2 text-white font-medium bg-blue-700 px-3 py-1 rounded">
-        {label}
-      </label>
+  ["Relevant Industry Experience", "industryExperience"],
+].map(([label, name]) => (
+  <div key={name} className="mb-4">
+    <label className="block mb-2 text-white font-medium bg-blue-700 px-3 py-1 rounded">
+      {label}
+    </label>
+
+    {name === "industryExperience" ? (
+      <select
+        name={name}
+        value={formData[name]}
+        onChange={handleChange}
+        className="w-full border rounded px-3 py-2"
+      >
+        <option value="">Select experience</option>
+        <option value="0-1">0-1 years</option>
+        <option value="1-3">1-3 years</option>
+        <option value="3-5">3-5 years</option>
+        <option value="5-10">5-10 years</option>
+        <option value="10+">10+ years</option>
+      </select>
+    ) : (
       <input
         type="text"
         name={name}
@@ -81,8 +96,10 @@ const CompetenciesStep = ({ formData, setFormData, onBack, onSubmit }) => {
         onChange={handleChange}
         className="w-full border rounded px-3 py-2"
       />
-    </div>
-  ))}
+    )}
+  </div>
+))}
+
 </div>
 
 

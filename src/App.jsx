@@ -7,6 +7,7 @@ import FinalOutputPreview from "./Components/FinalOutputPreview";
 
 export default function App() {
   const [step, setStep] = useState(1);
+
   const [formData, setFormData] = useState({
     businessUnit: "",
     jobFamily: "",
@@ -21,62 +22,76 @@ export default function App() {
     competencies: [],
   });
 
+  const [jobDescription, setJobDescription] = useState(null);
   const [accountabilities, setAccountabilities] = useState([]);
   const [kpis, setKpis] = useState([]);
-
   const [finalData, setFinalData] = useState(null);
+  const handleBack = () => setStep((prev) => prev - 1);
 
-  const handleNext = () => setStep(step + 1);
-  const handleBack = () => setStep(step - 1);
-console.log("kpis",kpis)
-const handleFinalSubmit = () => {
-  const data = {
-    ...formData,
-    accountabilities: accountabilities
-      .filter((a) => a.checked)
-      .map((a) => a.customText),
-    kpis: kpis
-      .filter((k) => k.checked)
-      .map((k) => k.customText), 
+  const onNextStep1 = (generatedJD) => {
+    setJobDescription(generatedJD);
+    setStep(2);
   };
-  setFinalData(data);
-  setStep(5);
-};
 
+  const onNextStep2 = (kpisFromAPI) => {
+    setKpis(kpisFromAPI);
+    setStep(3);
+  };
+  const onNextStep3 = () => {
+    setStep(4);
+  };
+
+  const onFinalSubmit = () => {
+    const final = {
+      ...formData,
+      jobDescription,
+      accountabilities: accountabilities
+        .filter((a) => a.checked)
+        .map((a) => a.customText),
+      kpis: kpis
+        .flatMap((group) =>
+          group.kpis.filter((kpi) => kpi.checked).map((kpi) => kpi.customText)
+        ),
+    };
+    setFinalData(final);
+    setStep(5);
+  };
+
+  
   return (
     <div className="max-w-5xl mx-auto p-6 bg-white shadow rounded-lg">
       {step === 1 && (
         <JobInfoStep
           formData={formData}
           setFormData={setFormData}
-          onNext={handleNext}
+          onNext={onNextStep1}
         />
       )}
       {step === 2 && (
         <AccountabilitiesStep
           roleSummary={formData.roleSummary}
+          jobDescription={jobDescription}
           accountabilities={accountabilities}
           setAccountabilities={setAccountabilities}
-          onNext={handleNext}
+          onNext={onNextStep2}
           onBack={handleBack}
         />
       )}
-      {step === 3 && (
-        <KPIStep
-          accountabilities={accountabilities}
-          kpis={kpis}
-          setKpis={setKpis}
-          onNext={handleNext}
-          onBack={handleBack}
-        />
-      )}
+    {step === 3 && (
+  <KPIStep
+    kpis={kpis}
+    setKpis={setKpis}
+    onNext={onNextStep3}
+    onBack={handleBack}
+  />
+)}
+
       {step === 4 && (
         <CompetenciesStep
           formData={formData}
           setFormData={setFormData}
           onBack={handleBack}
-          onSubmit={handleFinalSubmit}
-
+          onSubmit={onFinalSubmit}
         />
       )}
       {step === 5 && finalData && (

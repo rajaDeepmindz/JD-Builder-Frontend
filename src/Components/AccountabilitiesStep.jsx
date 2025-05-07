@@ -1,31 +1,27 @@
-import React, { useEffect } from "react";
-
-const defaultAccountabilities = [
-  "Cultivate a high performing PeopleOps team capable of exceeding expectations and objectives.",
-  "Drive business performance by strategically acquiring and developing high-potential talent across all levels.",
-  "Maximize employee engagement and productivity by fostering an innovative culture.",
-  "Strengthen management effectiveness with coaching and development.",
-  "Serve as a trusted advisor to the CEO and executive team.",
-];
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 
 const AccountabilitiesStep = ({
   roleSummary,
+  jobDescription,
   accountabilities,
   setAccountabilities,
   onNext,
   onBack,
 }) => {
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    if (accountabilities.length === 0) {
+    if (accountabilities.length === 0 && jobDescription?.description) {
       setAccountabilities(
-        defaultAccountabilities.map((text) => ({
+        jobDescription.description.map((text) => ({
           text,
           checked: false,
           customText: text,
         }))
       );
     }
-  }, [accountabilities, setAccountabilities]);
+  }, [accountabilities, jobDescription, setAccountabilities]);
 
   const toggleCheckbox = (i) => {
     const updated = [...accountabilities];
@@ -37,6 +33,41 @@ const AccountabilitiesStep = ({
     const updated = [...accountabilities];
     updated[i].customText = value;
     setAccountabilities(updated);
+  };
+  const getKeyPerformanceIndicators = async (responsibilities) => {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        "https://avtar.pharynxai.com/jd_creation/generate-kpis",
+        responsibilities
+      );
+  
+      const responsibilityKpis = response.data.responsibility_kpis;
+  
+      
+  
+      onNext(responsibilityKpis); // now it's a structured array
+    } catch (error) {
+      console.error("API Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
+  const handleNextClick = () => {
+    const selected = accountabilities
+      .filter((a) => a.checked)
+      .map((a) => a.customText);
+
+    console.log(JSON.stringify({ responsibilities: selected }, null, 2));
+
+    if (selected.length === 0) {
+      alert("Please select at least one accountability.");
+      return;
+    }
+
+    getKeyPerformanceIndicators({ responsibilities: selected });
   };
 
   return (
@@ -71,10 +102,13 @@ const AccountabilitiesStep = ({
           Back
         </button>
         <button
-          onClick={onNext}
-          className="bg-blue-700 text-white px-6 py-2 rounded hover:bg-blue-800"
+          onClick={handleNextClick}
+          disabled={loading}
+          className={`px-6 py-2 rounded text-white ${
+            loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-700 hover:bg-blue-800"
+          }`}
         >
-          Next
+          {loading ? "Loading..." : "Next"}
         </button>
       </div>
     </>
