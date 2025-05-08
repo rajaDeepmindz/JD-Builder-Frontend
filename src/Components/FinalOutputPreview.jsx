@@ -29,92 +29,233 @@ const FinalOutputPreview = ({ collectedData, onBack }) => {
   } = collectedData;
 
 
-  const downloadDocx = () => {
-    const cellStyle = {
-      margins: { top: 100, bottom: 100, left: 100, right: 100 },
-      borders: {
-        top: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
-        bottom: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
-        left: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
-        right: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
-      },
-    };
+
   
-    const heading = (text) =>
-      new Paragraph({
-        spacing: { before: 300, after: 100 },
-        children: [new TextRun({ text, bold: true })],
-      });
-  
-    const sectionChildren = [
-      new Paragraph({
-        alignment: "center",
-        spacing: { after: 300 },
-        children: [new TextRun({ text: "Final Output", bold: true, size: 28 })],
-      }),
-  
-      // Job Info Table
-      new Table({
-        width: { size: 100, type: WidthType.PERCENTAGE },
-        rows: [
-          new TableRow({
-            children: [
-              new TableCell({ ...cellStyle, children: [new Paragraph("Business Unit")] }),
-              new TableCell({ ...cellStyle, children: [new Paragraph(businessUnit)] }),
-              new TableCell({ ...cellStyle, children: [new Paragraph("Job Family")] }),
-              new TableCell({ ...cellStyle, children: [new Paragraph(jobFamily)] }),
-            ],
-          }),
-          new TableRow({
-            children: [
-              new TableCell({ ...cellStyle, children: [new Paragraph("Department")] }),
-              new TableCell({ ...cellStyle, children: [new Paragraph(department)] }),
-              new TableCell({ ...cellStyle, children: [new Paragraph("Position Title")] }),
-              new TableCell({ ...cellStyle, children: [new Paragraph(positionTitle)] }),
-            ],
-          }),
-          new TableRow({
-            children: [
-              new TableCell({ ...cellStyle, children: [new Paragraph("Job Grade")] }),
-              new TableCell({ ...cellStyle, children: [new Paragraph(jobGrade)] }),
-              new TableCell({ ...cellStyle, children: [new Paragraph("Location")] }),
-              new TableCell({ ...cellStyle, children: [new Paragraph(location)] }),
-            ],
-          }),
-        ],
-      }),
-  
-      heading("Role Summary/Purpose"),
-      new Paragraph(roleSummary),
-  
-      heading("Key Accountabilities and Deliverables"),
-      ...accountabilities.map((item) => new Paragraph("• " + item)),
-  
-      heading("Key Performance Indicators"),
-      ...kpis.map((item) => new Paragraph("• " + item)),
-  
-      heading("Educational Qualifications"),
-      new Paragraph(qualifications),
-  
-      heading("Relevant Industry Experience"),
-      new Paragraph(industryExperience),
-  
-      heading("Technical Competencies"),
-      ...competencies.map((item) => new Paragraph("• " + item)),
-    ];
-  
-    const doc = new Document({ sections: [{ children: sectionChildren }] });
-  
-    Packer.toBlob(doc).then((blob) => {
-      saveAs(blob, "final-report.docx");
-    });
+const downloadDocx = () => {
+  const spacing = new Paragraph({ spacing: { after: 200 } }); // 25px gap
+
+  const cellStyle = {
+    margins: { top: 100, bottom: 100, left: 100, right: 100 },
+    width: { size: 50, type: WidthType.PERCENTAGE },
   };
-  
+
+  const bulletList = (items) => items.map((item) => new Paragraph("• " + item));
+
+  const sectionChildren = [
+    // Blue Title Heading
+    new Paragraph({
+      alignment: "center",
+      spacing: { after: 300 },
+      children: [new TextRun({ text: "Job Description", bold: true, size: 30, color: "FFFFFF" })],
+      shading: { fill: "1C398E" },
+      padding: { top: 10, bottom: 10, left: 10, right: 10 },
+    }),
+
+    spacing,
+
+    // Job Info Table
+    // Job Info Table
+new Table({
+  width: { size: 100, type: WidthType.PERCENTAGE },
+  rows: [
+    new TableRow({
+      children: [
+        new TableCell({
+          ...cellStyle,
+          children: [new Paragraph({ children: [new TextRun({ text: "Business Unit", bold: true })] })],
+        }),
+        new TableCell({
+          ...cellStyle,
+          children: [new Paragraph(businessUnit)],
+        }),
+        new TableCell({
+          ...cellStyle,
+          children: [new Paragraph({ children: [new TextRun({ text: "Job Family", bold: true })] })],
+        }),
+        new TableCell({
+          ...cellStyle,
+          children: [new Paragraph(jobFamily)],
+        }),
+      ],
+    }),
+    new TableRow({
+      children: [
+        new TableCell({
+          ...cellStyle,
+          children: [new Paragraph({ children: [new TextRun({ text: "Department", bold: true })] })],
+        }),
+        new TableCell({
+          ...cellStyle,
+          children: [new Paragraph(department)],
+        }),
+        new TableCell({
+          ...cellStyle,
+          children: [new Paragraph({ children: [new TextRun({ text: "Position Title", bold: true })] })],
+        }),
+        new TableCell({
+          ...cellStyle,
+          children: [new Paragraph(positionTitle)],
+        }),
+      ],
+    }),
+    new TableRow({
+      children: [
+        new TableCell({
+          ...cellStyle,
+          children: [new Paragraph({ children: [new TextRun({ text: "Job Grade", bold: true })] })],
+        }),
+        new TableCell({
+          ...cellStyle,
+          children: [new Paragraph(jobGrade)],
+        }),
+        new TableCell({
+          ...cellStyle,
+          children: [new Paragraph({ children: [new TextRun({ text: "Location", bold: true })] })],
+        }),
+        new TableCell({
+          ...cellStyle,
+          children: [new Paragraph(location)],
+        }),
+      ],
+    }),
+  ],
+}),
+
+
+    spacing,
+
+    // Role Summary Table (Fixed layout)
+    new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      rows: [
+        new TableRow({
+          children: [
+            new TableCell({
+              columnSpan: 2,
+              ...cellStyle,
+              children: [
+                new Paragraph({
+                  children: [new TextRun({ text: "Role Summary/Purpose", bold: true })],
+                }),
+              ],
+            }),
+          ],
+        }),
+        new TableRow({
+          children: [
+            new TableCell({
+              columnSpan: 2,
+              ...cellStyle,
+              children: [new Paragraph(roleSummary)],
+            }),
+          ],
+        }),
+      ],
+    }),
+
+    spacing,
+
+    // Accountabilities and KPIs Table
+    new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      rows: [
+        new TableRow({
+          children: [
+            new TableCell({
+              ...cellStyle,
+              children: [new Paragraph({ children: [new TextRun({ text: "Key Accountabilities and Deliverables", bold: true })] })],
+            }),
+            new TableCell({
+              ...cellStyle,
+              children: [new Paragraph({ children: [new TextRun({ text: "Key Performance Indicators", bold: true })] })],
+            }),
+          ],
+        }),
+        new TableRow({
+          children: [
+            new TableCell({ ...cellStyle, children: bulletList(accountabilities) }),
+            new TableCell({ ...cellStyle, children: bulletList(kpis) }),
+          ],
+        }),
+      ],
+    }),
+
+    spacing,
+
+    // Educational Qualifications Table
+    new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      rows: [
+        new TableRow({
+          children: [
+            new TableCell({
+              ...cellStyle,
+              children: [new Paragraph({ children: [new TextRun({ text: "Educational Qualifications", bold: true })] })],
+            }),
+            new TableCell({
+              ...cellStyle,
+              children: [new Paragraph(qualifications)],
+            }),
+          ],
+        }),
+      ],
+    }),
+
+    spacing,
+
+    // Relevant Industry Experience Table
+    new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      rows: [
+        new TableRow({
+          children: [
+            new TableCell({
+              ...cellStyle,
+              children: [new Paragraph({ children: [new TextRun({ text: "Relevant Industry Experience", bold: true })] })],
+            }),
+            new TableCell({
+              ...cellStyle,
+              children: [new Paragraph(industryExperience)],
+            }),
+          ],
+        }),
+      ],
+    }),
+
+    spacing,
+
+    // Technical Competencies Table
+    new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      rows: [
+        new TableRow({
+          children: [
+            new TableCell({
+              ...cellStyle,
+              children: [new Paragraph({ children: [new TextRun({ text: "Technical Competencies", bold: true })] })],
+            }),
+            new TableCell({
+              ...cellStyle,
+              children: bulletList(competencies),
+            }),
+          ],
+        }),
+      ],
+    }),
+  ];
+
+  const doc = new Document({ sections: [{ children: sectionChildren }] });
+
+  Packer.toBlob(doc).then((blob) => {
+    saveAs(blob, "final-report.docx");
+  });
+};
+
 
   return (
     <div className="bg-white shadow border rounded p-6 text-sm space-y-6">
       <div className="bg-blue-900 text-white text-center py-2 font-bold">
-        Final Output
+        Job Description
       </div>
 
       <table className="w-full border text-left text-gray-800 text-sm">
@@ -198,10 +339,12 @@ const FinalOutputPreview = ({ collectedData, onBack }) => {
         <button onClick={onBack} className="text-blue-600 hover:underline">
           Back
         </button>
-        <button onClick={downloadDocx} className="text-purple-600 hover:underline">
-  Download as DOCX
-</button>
-
+        <button
+          onClick={downloadDocx}
+          className="text-purple-600 hover:underline"
+        >
+          Download as DOCX
+        </button>
       </div>
     </div>
   );
